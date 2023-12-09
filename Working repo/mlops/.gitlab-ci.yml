@@ -1,0 +1,114 @@
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+# Define stages for the pipelines
+stages:
+  - build
+  - test
+  - deploy
+
+# Define job templates for reusability
+.job_template: &job_template
+  image: your_docker_image  # Specify the Docker image with necessary dependencies
+  script:
+    - echo "Running $CI_JOB_NAME"
+
+# Data Pipeline Job
+data_pipeline:
+  <<: *job_template
+  stage: build
+  script:
+    - docker run --rm -v $PWD:/app -w /app your_data_pipeline_image python data_pipeline.py
+  artifacts:
+    paths:
+      - data/processed_data.csv
+
+# Training Pipeline Job
+training_pipeline:
+  <<: *job_template
+  stage: build
+  script:
+    - docker run --rm -v $PWD:/app -w /app your_training_pipeline_image python training_pipeline.py
+  artifacts:
+    paths:
+      - model/trained_model.pkl
+
+# Model Serving Job
+model_serving:
+  <<: *job_template
+  stage: test
+  script:
+    - docker run --rm -p 5000:5000 your_model_serving_image
+    # Additional steps for testing the model serving
+
+# Model Registry Job
+model_registry:
+  <<: *job_template
+  stage: deploy
+  dependencies:
+    - training_pipeline
+  script:
+    - docker run --rm -p 5001:5000 your_model_registry_image
+    # Additional steps for deploying the MLflow server
+
+# Deployment Job
+deployment:
+  <<: *job_template
+  stage: deploy
+  dependencies:
+    - training_pipeline
+    - model_serving
+  script:
+    - docker run --rm your_deployment_image
+    # Additional steps for deploying the trained model
+
+# Monitoring Job
+monitoring:
+  <<: *job_template
+  stage: test
+  script:
+    - docker run --rm your_monitoring_image
+    # Additional steps for monitoring the application
+
+# Define the CI/CD pipeline
+pipeline:
+  jobs:
+    - data_pipeline
+    - training_pipeline
+    - model_serving:
+        rules:
+          - exists:
+              - model/trained_model.pkl
+    - model_registry
+    - deployment
+    - monitoring
+
+# Debug this pipeline
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#when-manual
+# To trigger this pipeline, go to your project's CI/CD > Pipelines and click the "Run pipeline" button
+# debug:
+#   <<: *job_template
+#   stage: build
+#   when: manual
+#   script:
+#     - echo "Running $CI_JOB_NAME"
+```
+# write the pipeline include two pipeline data pipeline and model serving pipeline
+# trigger model serving pipeline by API 
+# after that deploy data pipeline and call the API we defined before
+# finally trigger model sẻ

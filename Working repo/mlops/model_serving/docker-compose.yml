@@ -1,0 +1,12 @@
+version: "3"
+services:
+  model-serving:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    environment:
+      - BENTOML_HOME=/bento
+    volumes:
+      - /path/to/model:/bento

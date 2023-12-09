@@ -1,0 +1,24 @@
+resources:
+  compute:
+    config:
+      max_workers: 4
+  storage:
+    config:
+      local_storage:
+        base_dir: /app/data
+
+solids:
+  preprocess_data:
+    inputs:
+      - name: input_file
+        value: /app/data/input.csv
+    config:
+      num_workers: 2
+      output_dir: /app/data/processed
+
+  analyze_data:
+    inputs:
+      - name: input_dir
+        value: /app/data/processed
+    config:
+      threshold: 0.5

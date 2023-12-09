@@ -1,0 +1,10 @@
+version: '3'
+services:
+  data_pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./pipeline:/app/pipeline
+      - ./data:/app/data
+    command: dagster pipeline execute --pipeline data_pipeline

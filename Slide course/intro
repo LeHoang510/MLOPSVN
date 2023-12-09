@@ -1,0 +1,4 @@
+MLOPs là viết tắt của Machine Learning Operations, là một tập hợp các thực tiễn và công cụ giúp triển khai, quản lý và vận hành các mô hình học máy trong môi trường sản xuất. 
+MLOPs giúp đảm bảo rằng các mô hình học máy được triển khai đúng cách, hiệu quả và có thể mở rộng.
+Mlops là sự kết hợp giữa Data engineer, machine learning, DevOps. 
+Mục đích là để có một hệ thống machine learning hoàn toàn tự động từ việc nhận dữ liệu xử lí dữ liệu, 
